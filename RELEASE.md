@@ -79,7 +79,34 @@ git push origin vx.x.x
 推送 tag 后，GitHub Actions 会自动：
 
 1. 在 Windows、macOS、Linux 三个系统上分别构建
-2. 生成 zip 格式的安装包
+2. 生成多种格式的安装包（见下表）
 3. 创建 Release 并上传构建产物
 
 工作流配置文件：`.github/workflows/build.yml`
+
+## 制品说明
+
+### Windows
+
+| 文件 | 说明 |
+|------|------|
+| `hias-diff-x.x.x-win-x64-setup.exe` | NSIS 安装包，推荐 |
+| `hias-diff-x.x.x-win-x64-portable.exe` | 便携版，解压即用，不写入注册表 |
+
+### macOS
+
+| 文件 | 说明 |
+|------|------|
+| `hias-diff-x.x.x-mac-x64.dmg` | DMG 安装包，拖入 Applications 即可 |
+| `hias-diff-x.x.x-mac-x64.zip` | 解压后拖入 Applications |
+
+### Linux
+
+| 文件 | 说明 |
+|------|------|
+| `hias-diff-x.x.x-linux-x64.AppImage` | 通用格式，chmod +x 后直接运行 |
+| `hias-diff-x.x.x-linux-x64.deb` | Debian / Ubuntu 安装包 |
+| `hias-diff-x.x.x-linux-x64.rpm` | Fedora / RHEL 安装包 |
+| `hias-diff-x.x.x-linux-x64.tar.gz` | 通用归档格式 |
+
+> ARM64 设备请选择文件名中带 `arm64` 的对应制品。

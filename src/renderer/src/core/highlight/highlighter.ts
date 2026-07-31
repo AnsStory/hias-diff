@@ -1,5 +1,6 @@
-import { createHighlighter, bundledLanguages, type BundledLanguage, type Highlighter } from 'shiki'
+import { createHighlighter, type Highlighter } from 'shiki'
 import type { TokenSpan } from './segment'
+import { getLangLoader } from './supported-languages'
 
 /** 明暗两套 shiki 主题：暗色模式用 github-dark，避免亮色语法色在暗底不可读 */
 export type HighlightTheme = 'github-light' | 'github-dark'
@@ -22,12 +23,12 @@ function ensureLanguage(highlighter: Highlighter, lang: string): Promise<boolean
   if (highlighter.getLoadedLanguages().includes(lang)) return Promise.resolve(true)
   let loading = langLoads.get(lang)
   if (!loading) {
-    const loader = bundledLanguages[lang as BundledLanguage]
+    const loader = getLangLoader(lang)
     if (!loader) {
       loading = Promise.resolve(false)
     } else {
       loading = highlighter
-        .loadLanguage(loader)
+        .loadLanguage(loader as any)
         .then(() => true)
         .catch(() => false)
     }

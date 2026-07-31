@@ -11,20 +11,9 @@ const { isDark, toggleTheme } = useTheme()
 
 const isElectron = navigator.userAgent.includes('Electron')
 
-const linkMap = {
-  win: 'https://github.com/hias-diff/releases/download/v0.1.0/hias-diff-0.1.0-win-x64.zip',
-  mac: 'https://github.com/hias-diff/releases/download/v0.1.0/hias-diff-0.1.0-mac-x64.zip',
-  linux: 'https://github.com/hias-diff/releases/download/v0.1.0/hias-diff-0.1.0-linux-x64.zip'
-}
-
-const downloadPlatform = [
-  { label: 'Windows', value: 'win' },
-  { label: 'MacOS', value: 'mac' },
-  { label: 'Linux', value: 'linux' }
-]
-const handleCommand = (command: string | number | object) => {
-  const url = linkMap[command as keyof typeof linkMap]
-  if (url) window.open(url, '_blank')
+const url = 'https://github.com/AnsStory/hias-diff/releases'
+const handleDownload = () => {
+  window.open(url, '_blank')
 }
 
 onMounted(() => {
@@ -44,16 +33,7 @@ onMounted(() => {
         :title="isDark() ? '切换为亮色' : '切换为暗色'"
         @click="toggleTheme"
       />
-      <el-dropdown v-if="!isElectron" @command="handleCommand" trigger="click">
-        <el-button :icon="Download" circle />
-        <template #dropdown>
-          <el-dropdown-menu>
-            <template v-for="(item, index) in downloadPlatform" :key="index">
-              <el-dropdown-item :command="item.value">{{ item.label }}</el-dropdown-item>
-            </template>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+      <el-button v-if="!isElectron" :icon="Download" circle title="下载" @click="handleDownload" />
     </header>
     <main class="app-main">
       <InputView v-if="store.screen === 'input'" />

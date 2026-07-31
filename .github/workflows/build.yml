@@ -43,7 +43,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-${{ matrix.platform }}
-          path: release/*.zip
+          path: |
+            release/*.exe
+            release/*.dmg
+            release/*.zip
+            release/*.tar.gz
+            release/*.AppImage
+            release/*.deb
+            release/*.rpm
+          if-no-files-found: error
 
   release:
     needs: build
@@ -62,5 +70,12 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: release/*.zip
+          files: |
+            release/*.exe
+            release/*.dmg
+            release/*.zip
+            release/*.tar.gz
+            release/*.AppImage
+            release/*.deb
+            release/*.rpm
           generate_release_notes: true

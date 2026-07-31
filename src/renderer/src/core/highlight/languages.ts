@@ -1,4 +1,4 @@
-import { bundledLanguagesInfo } from 'shiki'
+import { SUPPORTED_LANG_IDS } from './supported-languages'
 
 export interface LanguageOption {
   id: string
@@ -6,14 +6,97 @@ export interface LanguageOption {
 }
 
 /**
- * 语言下拉选项：纯文本置顶，其余为 shiki 全量语言（按名称排序）。
- * bundledLanguagesInfo 只是元数据（id/name/aliases），语法本体走动态 import，
- * 引入它不会把全部语法打进首屏包。
+ * 语言下拉选项：纯文本置顶，其余为受支持语言子集（按名称排序）。
+ * 只打包常用语言的语法，避免 shiki 全量引入导致产物膨胀。
  */
+const LANG_LABELS: Record<string, string> = {
+  plaintext: '纯文本',
+  javascript: 'JavaScript',
+  jsx: 'JSX',
+  typescript: 'TypeScript',
+  tsx: 'TSX',
+  vue: 'Vue',
+  svelte: 'Svelte',
+  astro: 'Astro',
+  html: 'HTML',
+  xml: 'XML',
+  css: 'CSS',
+  scss: 'SCSS',
+  less: 'Less',
+  postcss: 'PostCSS',
+  svg: 'SVG',
+  json: 'JSON',
+  jsonc: 'JSONC',
+  json5: 'JSON5',
+  jsonl: 'JSON Lines',
+  yaml: 'YAML',
+  toml: 'TOML',
+  ini: 'INI',
+  dotenv: 'dotenv',
+  csv: 'CSV',
+  markdown: 'Markdown',
+  mdx: 'MDX',
+  rst: 'reStructuredText',
+  asciidoc: 'AsciiDoc',
+  tex: 'TeX',
+  latex: 'LaTeX',
+  python: 'Python',
+  ruby: 'Ruby',
+  perl: 'Perl',
+  lua: 'Lua',
+  r: 'R',
+  php: 'PHP',
+  shellscript: 'Shell',
+  powershell: 'PowerShell',
+  bat: 'Batch',
+  fish: 'Fish',
+  make: 'Makefile',
+  cmake: 'CMake',
+  docker: 'Dockerfile',
+  nginx: 'Nginx',
+  c: 'C',
+  cpp: 'C++',
+  csharp: 'C#',
+  java: 'Java',
+  kotlin: 'Kotlin',
+  scala: 'Scala',
+  groovy: 'Groovy',
+  go: 'Go',
+  rust: 'Rust',
+  swift: 'Swift',
+  dart: 'Dart',
+  zig: 'Zig',
+  nim: 'Nim',
+  'objective-c': 'Objective-C',
+  'objective-cpp': 'Objective-C++',
+  haskell: 'Haskell',
+  elixir: 'Elixir',
+  erlang: 'Erlang',
+  clojure: 'Clojure',
+  fsharp: 'F#',
+  ocaml: 'OCaml',
+  julia: 'Julia',
+  sql: 'SQL',
+  graphql: 'GraphQL',
+  proto: 'Protocol Buffers',
+  diff: 'Diff',
+  bash: 'Bash',
+  handlebars: 'Handlebars',
+  pug: 'Pug',
+  jinja: 'Jinja',
+  matlab: 'MATLAB',
+  'fortran-free-form': 'Fortran',
+  vhdl: 'VHDL',
+  verilog: 'Verilog',
+  asm: 'Assembly',
+  solidity: 'Solidity',
+}
+
 export const LANGUAGES: LanguageOption[] = [
   { id: 'plaintext', label: '纯文本' },
-  ...bundledLanguagesInfo
-    .map((info) => ({ id: info.id, label: info.name }))
+  ...SUPPORTED_LANG_IDS
+    .filter((id) => id !== 'plaintext')
+    .map((id) => ({ id, label: LANG_LABELS[id] ?? id }))
     .sort((a, b) => a.label.localeCompare(b.label))
 ]
 
@@ -22,7 +105,6 @@ export const LANGUAGE_OPTIONS = LANGUAGES.map((lang) => ({ value: lang.id, label
 
 /**
  * 常用文件扩展名 / 特殊文件名 → shiki 语言 id。
- * shiki 元数据不含扩展名，故这里显式维护；value 必须是真实存在的 shiki id。
  * 未命中的扩展名回退纯文本（仍可在下拉里手动选任意语言）。
  */
 const EXTENSION_MAP: Record<string, string> = {
@@ -62,9 +144,8 @@ const EXTENSION_MAP: Record<string, string> = {
   xhtml: 'html',
   css: 'css',
   scss: 'scss',
-  sass: 'sass',
+  sass: 'scss',
   less: 'less',
-  styl: 'stylus',
   // 前端框架
   vue: 'vue',
   svelte: 'svelte',
@@ -78,7 +159,7 @@ const EXTENSION_MAP: Record<string, string> = {
   asciidoc: 'asciidoc',
   tex: 'tex',
   latex: 'latex',
-  bib: 'bibtex',
+  bib: 'latex',
   // 脚本
   py: 'python',
   pyw: 'python',
@@ -125,8 +206,6 @@ const EXTENSION_MAP: Record<string, string> = {
   dart: 'dart',
   zig: 'zig',
   nim: 'nim',
-  cr: 'crystal',
-  vb: 'vb',
   // 函数式 / 其它语言
   hs: 'haskell',
   ex: 'elixir',
@@ -138,23 +217,6 @@ const EXTENSION_MAP: Record<string, string> = {
   fsx: 'fsharp',
   ml: 'ocaml',
   jl: 'julia',
-  lisp: 'common-lisp',
-  el: 'emacs-lisp',
-  scm: 'scheme',
-  rkt: 'racket',
-  coffee: 'coffee',
-  // 科学 / 硬件
-  matlab: 'matlab',
-  f: 'fortran-fixed-form',
-  for: 'fortran-fixed-form',
-  f90: 'fortran-free-form',
-  f95: 'fortran-free-form',
-  vhd: 'vhdl',
-  vhdl: 'vhdl',
-  v: 'verilog',
-  sv: 'verilog',
-  asm: 'asm',
-  s: 'asm',
   // 数据库 / 查询 / 协议
   sql: 'sql',
   graphql: 'graphql',
@@ -167,14 +229,23 @@ const EXTENSION_MAP: Record<string, string> = {
   hbs: 'handlebars',
   handlebars: 'handlebars',
   pug: 'pug',
+  // 科学 / 硬件
+  matlab: 'matlab',
+  f90: 'fortran-free-form',
+  f95: 'fortran-free-form',
+  vhd: 'vhdl',
+  vhdl: 'vhdl',
+  v: 'verilog',
+  sv: 'verilog',
+  asm: 'asm',
+  s: 'asm',
   // 智能合约
-  sol: 'solidity'
+  sol: 'solidity',
 }
 
 /** 按文件名（扩展名或特殊全名）自动识别语言，识别不了则回退纯文本 */
 export function detectLanguage(fileName: string): string {
   const lower = fileName.toLowerCase()
-  // 无扩展名的特殊文件（Dockerfile / Makefile 等），split 后 pop 得到全名本身
   const ext = lower.split('.').pop() ?? ''
   return EXTENSION_MAP[ext] ?? 'plaintext'
 }
