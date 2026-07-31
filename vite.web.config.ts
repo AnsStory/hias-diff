@@ -44,5 +44,6 @@ export default defineConfig({
   },
   build: {
     outDir: resolve(__dirname, './docs')
-  }
+  },
+  base: './hias-diff'
 })
