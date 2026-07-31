@@ -1,0 +1,144 @@
+:root {
+  --color-bg: #f6f8fa;
+  --color-surface: #ffffff;
+  --color-border: #d0d7de;
+  --color-text: #1f2328;
+  --color-text-secondary: #59636e;
+  --color-accent: #1f883d;
+  --color-accent-hover: #1a7f37;
+  --color-removed-bg: #ffebe9;
+  --color-removed-strong: #ffb3ad;
+  --color-added-bg: #e6ffec;
+  --color-added-strong: #a6f2b4;
+  --color-empty-bg: #f6f8fa;
+  --color-empty-stripe: #eceef0;
+  --font-mono: Consolas, 'Cascadia Mono', 'Courier New', monospace;
+}
+
+/* 暗色主题：基调 #23272e（底）/ #2c313c（面板），其余细节色调由二者推导 */
+html.dark {
+  --color-bg: #23272e;
+  --color-surface: #2c313c;
+  --color-border: #3a414d;
+  --color-text: #d7dce3;
+  --color-text-secondary: #99a2af;
+  --color-accent: #2ea043;
+  --color-accent-hover: #3fb950;
+  --color-removed-bg: #3f2226;
+  --color-removed-strong: #6d2f35;
+  --color-added-bg: #1f3a28;
+  --color-added-strong: #2f5d3d;
+  --color-empty-bg: #23272e;
+  --color-empty-stripe: #333944;
+}
+
+/* normalize.css 已处理跨浏览器重置与 body 外边距；此处仅补充 box-sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  font-family: 'Segoe UI', 'Microsoft YaHei', system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--color-text);
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+/* ---------- 共享工具类 ---------- */
+
+.spacer {
+  flex: 1;
+}
+
+/* Element Plus el-select 宽度约束（语言选择器，输入页与结果页共用） */
+.lang-select {
+  width: 140px;
+}
+
+/* ---------- diff 行渲染（DiffPane 与结果页变更浮层共用） ---------- */
+
+.diff-row {
+  display: flex;
+  height: 24px;
+  line-height: 24px;
+  min-width: 100%;
+  width: max-content;
+}
+
+.diff-row .gutter {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  flex: 0 0 52px;
+  padding-right: 10px;
+  text-align: right;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  border-right: 1px solid var(--color-border);
+  user-select: none;
+}
+
+.diff-row .gutter + .gutter {
+  left: 52px;
+  border-left: none;
+}
+
+.diff-row .sign {
+  flex: 0 0 20px;
+  text-align: center;
+  user-select: none;
+  color: var(--color-text-secondary);
+}
+
+.diff-row .code {
+  flex: 1;
+  padding: 0 8px;
+  white-space: pre;
+  tab-size: 4;
+}
+
+.diff-row.kind-removed .code,
+.diff-row.kind-removed .sign {
+  background: var(--color-removed-bg);
+}
+
+.diff-row.kind-added .code,
+.diff-row.kind-added .sign {
+  background: var(--color-added-bg);
+}
+
+.diff-row.kind-empty .code {
+  /* 对角斜纹用 background-size 平铺（竖直周期 8px 能整除行高 24px），
+     每行相位一致、跨行无缝连续，避免逐行重绘导致的斜纹断裂 */
+  background-color: var(--color-empty-bg);
+  background-image: linear-gradient(
+    -45deg,
+    var(--color-empty-stripe) 25%,
+    transparent 25%,
+    transparent 50%,
+    var(--color-empty-stripe) 50%,
+    var(--color-empty-stripe) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 8px 8px;
+}
+
+.diff-row.kind-removed .code .emphasized {
+  background: var(--color-removed-strong);
+  border-radius: 2px;
+}
+
+.diff-row.kind-added .code .emphasized {
+  background: var(--color-added-strong);
+  border-radius: 2px;
+}
