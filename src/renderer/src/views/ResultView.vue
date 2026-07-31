@@ -282,7 +282,9 @@ function applyIgnore(): void {
         {{ copied === 'right' ? '已复制' : '复制右侧' }}
       </el-button>
       <template v-if="result">
-        <el-tag v-if="result.identical" type="info" round>两段文本完全相同</el-tag>
+        <el-tag class="m-l-12" v-if="result.identical" type="success" round>
+          两段文本完全相同
+        </el-tag>
         <template v-else>
           <el-tag type="danger" round class="m-l-12">−{{ result.stats.deletions }} 删除</el-tag>
           <el-tag type="success" round class="m-l-12">+{{ result.stats.additions }} 新增</el-tag>
