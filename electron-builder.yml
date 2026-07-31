@@ -10,6 +10,8 @@ asar: true
 win:
   target:
     - nsis
+    - zip
+  artifactName: ${productName}-${version}-${os}-${arch}.${ext}
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
@@ -18,8 +20,12 @@ nsis:
 mac:
   target:
     - dmg
+    - zip
+  artifactName: ${productName}-${version}-${os}-${arch}.${ext}
 linux:
   target:
     - AppImage
+    - zip
+  artifactName: ${productName}-${version}-${os}-${arch}.${ext}
   category: Utility
 npmRebuild: false
