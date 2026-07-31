@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import type { RenderLine } from '../core/render'
 import { segmentLine, type Segment, type TokenSpan } from '../core/highlight/segment'
+import type { ScrollbarInstance } from 'element-plus'
 
 const props = withDefaults(
   defineProps<{
@@ -21,6 +22,7 @@ const emit = defineEmits<{
 const ROW_HEIGHT = 24
 const BUFFER = 10
 
+const scrollbarRef = ref<ScrollbarInstance | null>(null)
 const container = ref<HTMLElement | null>(null)
 const scrollTop = ref(0)
 const viewportHeight = ref(600)
@@ -118,7 +120,9 @@ function setScrollTop(top: number): void {
 }
 
 function scrollToIndex(index: number): void {
-  container.value?.scrollTo({ top: Math.max(0, index * ROW_HEIGHT - viewportHeight.value / 3) })
+  const el = container.value
+  if (!el) return
+  el.scrollTo({ top: Math.max(0, index * ROW_HEIGHT - viewportHeight.value / 3) })
 }
 
 defineExpose({ setScrollTop, scrollToIndex })
@@ -131,13 +135,14 @@ function segmentsFor(line: RenderLine): Segment[] {
 }
 
 onMounted(() => {
-  const el = container.value
-  if (!el) return
-  viewportHeight.value = el.clientHeight
+  const wrap = scrollbarRef.value?.wrapRef
+  if (!wrap) return
+  container.value = wrap
+  viewportHeight.value = wrap.clientHeight
   resizeObserver = new ResizeObserver(() => {
-    viewportHeight.value = el.clientHeight
+    viewportHeight.value = wrap.clientHeight
   })
-  resizeObserver.observe(el)
+  resizeObserver.observe(wrap)
 })
 
 onBeforeUnmount(() => {
@@ -147,7 +152,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="container" class="diff-pane" @scroll="onScroll" @mouseleave="hoveredBlock = -1">
+  <el-scrollbar ref="scrollbarRef" class="diff-pane" @scroll="onScroll" @mouseleave="hoveredBlock = -1">
     <div class="diff-spacer" :style="{ height: lines.length * ROW_HEIGHT + 'px' }">
       <el-button
         v-if="hoveredBlockData"
@@ -182,17 +187,24 @@ onBeforeUnmount(() => {
         </div>
       </div>
     </div>
-  </div>
+  </el-scrollbar>
 </template>
 
 <style scoped>
 .diff-pane {
   flex: 1;
   min-width: 0;
-  overflow: auto;
   background: var(--color-surface);
   font-family: var(--font-mono);
   font-size: 13px;
+}
+
+.diff-pane :deep(.el-scrollbar__wrap) {
+  overflow: auto;
+}
+
+.diff-pane :deep(.el-scrollbar__view) {
+  height: 100%;
 }
 
 .diff-spacer {

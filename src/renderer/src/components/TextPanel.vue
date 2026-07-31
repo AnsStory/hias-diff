@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { MAX_FILE_SIZE, useDiffStore } from '../stores/diff'
 import { decodeBytes, looksBinary } from '@shared/encoding'
 
@@ -8,10 +8,23 @@ const props = defineProps<{
   title: string
 }>()
 
+const emit = defineEmits<{
+  scroll: [scrollTop: number]
+}>()
+
 const store = useDiffStore()
 const dragging = ref(false)
 const errorMsg = ref('')
 const fileInput = ref<HTMLInputElement | null>(null)
+const textareaRef = ref<HTMLTextAreaElement | null>(null)
+
+function setScrollTop(top: number): void {
+  if (textareaRef.value) {
+    textareaRef.value.scrollTop = top
+  }
+}
+
+defineExpose({ setScrollTop })
 
 const text = computed({
   get: () => (props.side === 'left' ? store.leftText : store.rightText),
@@ -21,9 +34,7 @@ const text = computed({
   }
 })
 
-const fileName = computed(() =>
-  props.side === 'left' ? store.leftFileName : store.rightFileName
-)
+const fileName = computed(() => (props.side === 'left' ? store.leftFileName : store.rightFileName))
 
 const ERROR_TEXT: Record<string, string> = {
   binary: '不支持二进制文件',
@@ -80,12 +91,38 @@ async function onDrop(event: DragEvent): Promise<void> {
   const file = event.dataTransfer?.files?.[0]
   if (file) await loadFile(file)
 }
+
+let syncing = false
+function onScroll(): void {
+  if (syncing || !textareaRef.value) return
+  syncing = true
+  emit('scroll', textareaRef.value.scrollTop)
+  requestAnimationFrame(() => {
+    syncing = false
+  })
+}
+
+onMounted(() => {
+  // 获取 el-input 内部的 textarea 元素
+  const el = document.querySelector(`.text-panel[data-side="${props.side}"] textarea`) as HTMLTextAreaElement | null
+  if (el) {
+    textareaRef.value = el
+    el.addEventListener('scroll', onScroll)
+  }
+})
+
+onUnmounted(() => {
+  if (textareaRef.value) {
+    textareaRef.value.removeEventListener('scroll', onScroll)
+  }
+})
 </script>
 
 <template>
   <section
     class="text-panel"
     :class="{ dragging }"
+    :data-side="side"
     @dragover.prevent="dragging = true"
     @dragleave="dragging = false"
     @drop.prevent="onDrop"
@@ -97,19 +134,21 @@ async function onDrop(event: DragEvent): Promise<void> {
       <span class="spacer" />
       <el-button size="small" @click="openFile">打开文件</el-button>
       <el-button size="small" @click="store.clearSide(side)">清空</el-button>
-      <input
-        ref="fileInput"
-        type="file"
-        class="file-input-hidden"
-        @change="onFileInputChange"
-      />
+      <input ref="fileInput" type="file" class="file-input-hidden" @change="onFileInputChange" />
     </div>
-    <textarea
+    <el-input
       v-model="text"
       class="panel-input"
       spellcheck="false"
       :placeholder="`在此粘贴${title}，或将文件拖入此区域…`"
+      type="textarea"
     />
+    <!-- <textarea
+      v-model="text"
+      class="panel-input"
+      spellcheck="false"
+      :placeholder="`在此粘贴${title}，或将文件拖入此区域…`"
+    /> -->
   </section>
 </template>
 
@@ -158,7 +197,7 @@ async function onDrop(event: DragEvent): Promise<void> {
 .panel-input {
   flex: 1;
   min-height: 0;
-  padding: 10px 12px;
+  padding: 10px;
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.5;
@@ -166,11 +205,25 @@ async function onDrop(event: DragEvent): Promise<void> {
   outline: none;
   resize: none;
   white-space: pre;
+}
+:deep(.panel-input textarea) {
+  height: 100%;
+  /* height: 100% !important; */
   background: var(--color-surface);
   color: var(--color-text);
 }
-
-.panel-input::placeholder {
-  color: var(--color-text-secondary);
+:deep(.panel-input textarea::-webkit-scrollbar) {
+  width: 8px;
+  height: 8px;
+}
+:deep(.panel-input textarea::-webkit-scrollbar-track) {
+  background: transparent;
+}
+:deep(.panel-input textarea::-webkit-scrollbar-thumb) {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+:deep(.panel-input textarea::-webkit-scrollbar-thumb:hover) {
+  background: var(--color-text-secondary);
 }
 </style>
