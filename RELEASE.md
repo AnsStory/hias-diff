@@ -98,7 +98,6 @@ git push origin vx.x.x
 | 文件 | 说明 |
 |------|------|
 | `hias-diff-x.x.x-mac-x64.dmg` | DMG 安装包，拖入 Applications 即可 |
-| `hias-diff-x.x.x-mac-x64.zip` | 解压后拖入 Applications |
 
 ### Linux
 
@@ -107,6 +106,5 @@ git push origin vx.x.x
 | `hias-diff-x.x.x-linux-x64.AppImage` | 通用格式，chmod +x 后直接运行 |
 | `hias-diff-x.x.x-linux-x64.deb` | Debian / Ubuntu 安装包 |
 | `hias-diff-x.x.x-linux-x64.rpm` | Fedora / RHEL 安装包 |
-| `hias-diff-x.x.x-linux-x64.tar.gz` | 通用归档格式 |
 
-> ARM64 设备请选择文件名中带 `arm64` 的对应制品。
+> 仅提供 x64 架构的构建产物。
