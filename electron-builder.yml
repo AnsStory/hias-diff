@@ -59,7 +59,9 @@ linux:
   category: Utility
 deb:
   artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+  maintainer: hias <story0809@163.com>
 rpm:
   artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+  maintainer: hias <story0809@163.com>
 
 npmRebuild: false
