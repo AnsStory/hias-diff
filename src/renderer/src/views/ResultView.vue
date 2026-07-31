@@ -284,18 +284,22 @@ function applyIgnore(): void {
       <template v-if="result">
         <el-tag v-if="result.identical" type="info" round>两段文本完全相同</el-tag>
         <template v-else>
-          <el-tag type="danger" round>−{{ result.stats.deletions }} 删除</el-tag>
-          <el-tag type="success" round>+{{ result.stats.additions }} 新增</el-tag>
+          <el-tag type="danger" round class="m-l-12">−{{ result.stats.deletions }} 删除</el-tag>
+          <el-tag type="success" round class="m-l-12">+{{ result.stats.additions }} 新增</el-tag>
         </template>
       </template>
       <span class="spacer" />
+      <span class="prompt">
+        <el-text type="danger">*</el-text>
+        双击变更行可查看该变更块内所有差异
+      </span>
       <el-select-v2
         v-model="store.language"
         :options="LANGUAGE_OPTIONS"
         filterable
-        class="lang-select"
+        class="lang-select m-l-12"
       />
-      <el-radio-group v-model="store.viewMode">
+      <el-radio-group v-model="store.viewMode" class="m-l-12">
         <el-radio-button value="split">并排</el-radio-button>
         <el-radio-button value="unified">统一</el-radio-button>
       </el-radio-group>
@@ -306,7 +310,11 @@ function applyIgnore(): void {
         v-model:visible="ignorePanelVisible"
       >
         <template #reference>
-          <el-button :icon="Filter" :type="ignorePanelVisible ? 'primary' : 'default'">
+          <el-button
+            :icon="Filter"
+            :type="ignorePanelVisible ? 'primary' : 'default'"
+            class="m-l-12"
+          >
             忽略规则
           </el-button>
         </template>
@@ -498,8 +506,7 @@ function applyIgnore(): void {
 .result-toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
+  padding: 8px;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   flex-wrap: wrap;
@@ -640,5 +647,13 @@ function applyIgnore(): void {
   background: var(--color-bg);
   background: var(--color-surface);
   border-top: 1px solid var(--color-border);
+}
+
+.m-l-12 {
+  margin-left: 12px;
+}
+.prompt {
+  font-weight: 600;
+  color: var(--color-text-secondary);
 }
 </style>
