@@ -26,14 +26,22 @@ onMounted(() => {
     <header class="app-header">
       <span class="brand-name">hias-diff</span>
       <span class="spacer" />
-      <el-button
-        class="theme-toggle"
-        circle
-        :icon="isDark() ? Sunny : Moon"
-        :title="isDark() ? '切换为亮色' : '切换为暗色'"
-        @click="toggleTheme"
-      />
-      <el-button v-if="!isElectron" :icon="Download" circle title="下载" @click="handleDownload" />
+      <div>
+        <el-button
+          class="theme-toggle"
+          circle
+          :icon="isDark() ? Sunny : Moon"
+          :title="isDark() ? '切换为亮色' : '切换为暗色'"
+          @click="toggleTheme"
+        />
+        <el-button
+          v-if="!isElectron"
+          :icon="Download"
+          circle
+          title="下载"
+          @click="handleDownload"
+        />
+      </div>
     </header>
     <main class="app-main">
       <InputView v-if="store.screen === 'input'" />

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, shallowRef, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { Back, Switch, DocumentCopy, Filter, Top, Bottom, Close } from '@element-plus/icons-vue'
 import { useDiffStore } from '../stores/diff'
 import DiffPane from '../components/DiffPane.vue'
@@ -12,6 +12,9 @@ import { LANGUAGE_OPTIONS } from '../core/highlight/languages'
 import { theme } from '../composables/useTheme'
 
 const store = useDiffStore()
+
+const toolbarRef = ref<HTMLElement | null>(null)
+const toolbarHeight = ref(0)
 
 const leftPane = ref<InstanceType<typeof DiffPane> | null>(null)
 const rightPane = ref<InstanceType<typeof DiffPane> | null>(null)
@@ -105,11 +108,10 @@ const popupRenderRow = computed(() => {
   return idx >= 0 ? idx : 0
 })
 
-// 浮层纵向位置：卡片正文（差异行）覆盖在变更块处，导航条落在块上沿之上，随滚动跟随
+// 浮层纵向位置
 const popupTop = computed(() => {
-  const raw = popupRenderRow.value * ROW_HEIGHT - scrollTop.value - 34
-  const maxTop = Math.max(4, (resultBody.value?.clientHeight ?? 600) - 120)
-  return Math.min(Math.max(raw, 4), maxTop)
+  const top = popupRenderRow.value * ROW_HEIGHT - scrollTop.value - toolbarHeight.value
+  return top
 })
 
 // 浮层内展示的当前变更块（并排：左右两列成对；统一：单列）
@@ -157,6 +159,20 @@ async function refreshTokens(): Promise<void> {
 watch(() => store.language, refreshTokens, { immediate: true })
 // 明暗切换后语法色需随之切换，重新 tokenize
 watch(theme, refreshTokens)
+
+let toolbarObserver: ResizeObserver | null = null
+onMounted(() => {
+  if (toolbarRef.value) {
+    toolbarHeight.value = toolbarRef.value.clientHeight
+    toolbarObserver = new ResizeObserver(([entry]) => {
+      toolbarHeight.value = entry.contentRect.height
+    })
+    toolbarObserver.observe(toolbarRef.value)
+  }
+})
+onUnmounted(() => {
+  toolbarObserver?.disconnect()
+})
 
 let syncing = false
 function syncScroll(from: 'left' | 'right', top: number): void {
@@ -256,7 +272,7 @@ function applyIgnore(): void {
 
 <template>
   <div class="result-view">
-    <div class="result-toolbar">
+    <div class="result-toolbar" ref="toolbarRef">
       <el-button :icon="Back" @click="store.backToInput()">重新编辑</el-button>
       <el-button :icon="Switch" @click="store.swapSides()">互换</el-button>
       <el-button :icon="DocumentCopy" @click="copySide('left')">
@@ -577,6 +593,7 @@ function applyIgnore(): void {
 
 .change-popup-nav {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 10px;
   padding: 6px 14px;

@@ -35,7 +35,7 @@ export type SupportedLangId =
   | 'solidity'
 
 /** 懒加载 map：key 与 shiki 内置 id 对齐，值为动态 import loader */
-const LANG_LOADERS: Record<string, () => Promise<void>> = {
+const LANG_LOADERS: Record<string, () => Promise<unknown>> = {
   javascript:       () => import('shiki/langs/javascript.mjs'),
   jsx:              () => import('shiki/langs/jsx.mjs'),
   typescript:       () => import('shiki/langs/typescript.mjs'),
@@ -117,7 +117,7 @@ const LANG_LOADERS: Record<string, () => Promise<void>> = {
   solidity:         () => import('shiki/langs/solidity.mjs'),
 }
 
-export function getLangLoader(lang: string): (() => Promise<void>) | undefined {
+export function getLangLoader(lang: string): (() => Promise<unknown>) | undefined {
   return LANG_LOADERS[lang]
 }
 
