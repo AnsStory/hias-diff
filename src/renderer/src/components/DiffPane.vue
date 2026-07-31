@@ -28,9 +28,7 @@ const scrollTop = ref(0)
 const viewportHeight = ref(600)
 let resizeObserver: ResizeObserver | null = null
 
-const startIndex = computed(() =>
-  Math.max(0, Math.floor(scrollTop.value / ROW_HEIGHT) - BUFFER)
-)
+const startIndex = computed(() => Math.max(0, Math.floor(scrollTop.value / ROW_HEIGHT) - BUFFER))
 const endIndex = computed(() =>
   Math.min(
     props.lines.length,
@@ -152,7 +150,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <el-scrollbar ref="scrollbarRef" class="diff-pane" @scroll="onScroll" @mouseleave="hoveredBlock = -1">
+  <el-scrollbar
+    ref="scrollbarRef"
+    class="diff-pane"
+    @scroll="onScroll"
+    @mouseleave="hoveredBlock = -1"
+  >
     <div class="diff-spacer" :style="{ height: lines.length * ROW_HEIGHT + 'px' }">
       <el-button
         v-if="hoveredBlockData"

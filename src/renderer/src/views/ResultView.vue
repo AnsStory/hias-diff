@@ -450,7 +450,7 @@ function applyIgnore(): void {
           <el-button type="warning" title="用左侧此处内容覆盖右侧" @click="mergeBlock('toRight')">
             合并 →
           </el-button>
-          <el-button circle :icon="Close" title="关闭" @click="popupVisible = false" />
+          <el-button text :icon="Close" title="关闭" @click="popupVisible = false" />
           <el-button type="success" title="用右侧此处内容覆盖左侧" @click="mergeBlock('toLeft')">
             ← 合并
           </el-button>
@@ -517,7 +517,7 @@ function applyIgnore(): void {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin: 6px 0 4px 22px;
+  /* margin: 6px 0 4px 22px; */
 }
 
 .ignore-flags {
@@ -530,15 +530,15 @@ function applyIgnore(): void {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 24px;
+  /* min-width: 24px; */
+  width: min-content;
   height: 24px;
-  padding: 0 6px;
+  padding: 0 2px;
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--color-text-secondary);
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: 12px;
 }
 
 .rule-chips {
@@ -598,6 +598,7 @@ function applyIgnore(): void {
   gap: 10px;
   padding: 6px 14px;
   background: var(--color-bg);
+  background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -635,9 +636,9 @@ function applyIgnore(): void {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
   padding: 8px;
   background: var(--color-bg);
+  background: var(--color-surface);
   border-top: 1px solid var(--color-border);
 }
 </style>
