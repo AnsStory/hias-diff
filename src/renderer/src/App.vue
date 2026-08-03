@@ -1,21 +1,44 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { useDiffStore } from './stores/diff'
 import InputView from './views/InputView.vue'
 import ResultView from './views/ResultView.vue'
 import UpdateSWDialog from './components/UpdateSWDialog.vue'
 import HeaderActions from './components/HeaderActions.vue'
 import { getElColorPrimary, handleThemeStyle } from './utils/theme'
+import { animationMonitor } from './utils/animation'
 
 const store = useDiffStore()
+let animationFrameId: number | null = null
+
 const handleHeaderClick = () => {
   store.screen = 'input'
   store.reset()
 }
 
+function startPerformanceMonitoring(): void {
+  function animate() {
+    animationMonitor.measure()
+    animationFrameId = requestAnimationFrame(animate)
+  }
+  animate()
+}
+
+function stopPerformanceMonitoring(): void {
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId)
+    animationFrameId = null
+  }
+}
+
 onMounted(() => {
   const primaryColor = getElColorPrimary()
   handleThemeStyle(primaryColor)
+  startPerformanceMonitoring()
+})
+
+onUnmounted(() => {
+  stopPerformanceMonitoring()
 })
 </script>
 

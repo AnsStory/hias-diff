@@ -20,7 +20,9 @@ import { tokenizeLines } from '../core/highlight/highlighter'
 import { segmentLine, type Segment, type TokenSpan } from '../core/highlight/segment'
 import { LANGUAGE_OPTIONS } from '../core/highlight/languages'
 import { theme } from '../composables/useTheme'
+import { getAnimationClass } from '../utils/animation'
 
+const promptAnimationClass = computed(() => getAnimationClass('lightSpeedInRight'))
 const store = useDiffStore()
 
 const toolbarRef = ref<HTMLElement | null>(null)
@@ -344,7 +346,7 @@ function applyIgnore(): void {
         </template>
       </template>
       <span class="spacer" />
-      <span class="prompt animate__animated animate__lightSpeedInRight">
+      <span :class="promptAnimationClass" class="prompt">
         <el-text type="danger">*</el-text>
         双击变更行可查看该变更块内所有差异
       </span>

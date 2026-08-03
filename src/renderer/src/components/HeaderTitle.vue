@@ -1,8 +1,13 @@
-<script setup></script>
+<script setup>
+import { computed } from 'vue'
+import { getAnimationClass } from '../utils/animation'
+
+const animationClass = computed(() => getAnimationClass('bounceIn'))
+</script>
 
 <template>
   <div class="HeaderTitle">
-    <span class="brand-name animate__bounceIn brand-name--double-line">
+    <span :class="animationClass + ' brand-name brand-name--double-line'">
       <span class="brand-logo shine-img">
         <img src="/favicon.svg" alt="logo" />
       </span>
