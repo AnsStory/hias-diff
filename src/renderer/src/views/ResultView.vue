@@ -1,6 +1,16 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
-import { Back, Switch, DocumentCopy, Filter, Top, Bottom, Close } from '@element-plus/icons-vue'
+import {
+  Back,
+  Switch,
+  DocumentCopy,
+  Filter,
+  Top,
+  Bottom,
+  Close,
+  RefreshLeft,
+  RefreshRight
+} from '@element-plus/icons-vue'
 import { useDiffStore } from '../stores/diff'
 import DiffPane from '../components/DiffPane.vue'
 import { buildUnifiedRows, getDiffBlocks } from '../core/diff/unified'
@@ -160,7 +170,6 @@ async function refreshTokens(): Promise<void> {
 watch(() => store.language, refreshTokens, { immediate: true })
 // 明暗切换后语法色需随之切换，重新 tokenize
 watch(theme, refreshTokens)
-
 let toolbarObserver: ResizeObserver | null = null
 onMounted(() => {
   if (toolbarRef.value) {
@@ -170,10 +179,32 @@ onMounted(() => {
     })
     toolbarObserver.observe(toolbarRef.value)
   }
+  // 添加键盘快捷键监听
+  document.addEventListener('keydown', handleKeydown)
 })
+
 onUnmounted(() => {
   toolbarObserver?.disconnect()
+  document.removeEventListener('keydown', handleKeydown)
 })
+
+/** 键盘快捷键处理 */
+function handleKeydown(e: KeyboardEvent): void {
+  // Ctrl+Z / Cmd+Z: 撤销
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+    e.preventDefault()
+    store.undo()
+  }
+  // Ctrl+Y / Cmd+Shift+Z / Ctrl+Shift+Z: 重做
+  if (
+    ((e.ctrlKey || e.metaKey) && e.key === 'y') ||
+    ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') ||
+    ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Z')
+  ) {
+    e.preventDefault()
+    store.redo()
+  }
+}
 
 let syncing = false
 function syncScroll(from: 'left' | 'right', top: number, left: number): void {
@@ -233,6 +264,9 @@ function mergeBlock(direction: 'toRight' | 'toLeft'): void {
     const rightSource = inBlock && direction === 'toRight' ? row.left : row.right
     if (rightSource.type !== 'empty') newRight.push(rightSource.text)
   }
+  // 保存当前状态到撤销栈
+  const directionText = direction === 'toRight' ? '→' : '←'
+  store.pushUndoState(`合并变更块 ${currentBlock.value + 1} ${directionText}`)
   store.leftText = newLeft.join('\n')
   store.rightText = newRight.join('\n')
   store.runDiff()
@@ -276,8 +310,24 @@ function applyIgnore(): void {
 <template>
   <div class="result-view">
     <div class="result-toolbar" ref="toolbarRef">
-      <el-button :icon="Back" @click="store.backToInput()">重新编辑</el-button>
+      <el-button type="primary" :icon="Back" @click="store.backToInput()">重新编辑</el-button>
       <el-button :icon="Switch" @click="store.swapSides()">互换</el-button>
+      <el-button
+        :icon="RefreshLeft"
+        :disabled="!store.canUndo"
+        @click="store.undo()"
+        title="撤销上一次合并操作 (Ctrl+Z)"
+      >
+        撤销
+      </el-button>
+      <el-button
+        :icon="RefreshRight"
+        :disabled="!store.canRedo"
+        @click="store.redo()"
+        title="重做被撤销的操作 (Ctrl+Y)"
+      >
+        重做
+      </el-button>
       <el-button :icon="DocumentCopy" @click="copySide('left')">
         {{ copied === 'left' ? '已复制' : '复制左侧' }}
       </el-button>
@@ -294,15 +344,16 @@ function applyIgnore(): void {
         </template>
       </template>
       <span class="spacer" />
-      <span class="prompt">
+      <span class="prompt animate__animated animate__lightSpeedInRight">
         <el-text type="danger">*</el-text>
         双击变更行可查看该变更块内所有差异
       </span>
       <el-select-v2
+        style="width: 160px"
         v-model="store.language"
         :options="LANGUAGE_OPTIONS"
         filterable
-        class="lang-select m-l-12"
+        class="m-l-12"
       />
       <el-radio-group v-model="store.viewMode" class="m-l-12">
         <el-radio-button value="split">并排</el-radio-button>
@@ -316,6 +367,7 @@ function applyIgnore(): void {
       >
         <template #reference>
           <el-button
+            type="primary"
             :icon="Filter"
             :type="ignorePanelVisible ? 'primary' : 'default'"
             class="m-l-12"
@@ -515,6 +567,9 @@ function applyIgnore(): void {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   flex-wrap: wrap;
+}
+.spacer {
+  flex: 1;
 }
 
 /* 忽略规则面板（el-popover 内容） */

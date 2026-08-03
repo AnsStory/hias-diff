@@ -41,7 +41,7 @@ function syncScroll(from: 'left' | 'right', top: number): void {
         一键清空
       </el-button>
       <el-button
-        type="success"
+        type="primary"
         :disabled="!store.leftText && !store.rightText"
         @click="store.runDiff()"
       >

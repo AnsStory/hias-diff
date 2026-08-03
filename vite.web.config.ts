@@ -36,7 +36,7 @@ export default defineConfig({
         name: 'hias-diff', // edge应用显示全称
         short_name: 'hias-diff',
         description: 'hias-diff 对比工具',
-        start_url: '/',
+        start_url: '/hias-diff/', // 启动页
         display: 'standalone', // 独立窗口，不带浏览器地址栏，和GitHub效果完全一致
         background_color: '#23272e', // 启动背景色，适配深色
         theme_color: '#7e57c2',

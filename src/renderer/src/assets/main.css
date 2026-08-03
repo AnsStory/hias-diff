@@ -31,7 +31,8 @@ html.dark {
   --color-added-strong: #2f5d3d;
   --color-empty-bg: #23272e;
   --color-empty-stripe: #333944;
-
+  --el-color-primary: #7e57c2;
+  --el-fill-color-blank: var(--color-bg);
 }
 
 /* normalize.css 已处理跨浏览器重置与 body 外边距；此处仅补充 box-sizing */
@@ -55,16 +56,6 @@ body {
   overflow: hidden;
 }
 
-/* ---------- 共享工具类 ---------- */
-
-.spacer {
-  flex: 1;
-}
-
-/* Element Plus el-select 宽度约束（语言选择器，输入页与结果页共用） */
-.lang-select {
-  width: 140px;
-}
 
 /* ---------- diff 行渲染（DiffPane 与结果页变更浮层共用） ---------- */
 
@@ -141,4 +132,109 @@ body {
 .diff-row.kind-added .code .emphasized {
   background: var(--color-added-strong);
   border-radius: 2px;
+}
+
+/* ---------- 扫光效果 ---------- */
+
+.shine-text {
+  background: linear-gradient(45deg,
+      currentColor 0%,
+      currentColor 40%,
+      rgba(255, 255, 255, 0.8) 50%,
+      currentColor 60%,
+      currentColor 100%);
+  background-size: 200% 100%;
+  background-position: 200% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 2s infinite;
+}
+
+@keyframes shine {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* ---------- el-button 扫光效果 ---------- */
+
+@keyframes btn-sheen {
+  0% {
+    transform: skewX(-45deg) translateX(0);
+  }
+
+  100% {
+    transform: skewX(-45deg) translateX(280px);
+  }
+}
+
+.el-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease-in-out;
+
+  &::before {
+    content: '';
+    background-color: rgba(255, 255, 255, 0.5);
+    height: 100%;
+    width: 48px;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: -72px;
+    transform: skewX(-45deg);
+    transition: none;
+    pointer-events: none;
+  }
+
+  &:not(:disabled):hover {
+    &::before {
+      animation: btn-sheen 0.5s ease-in-out;
+    }
+  }
+
+  &:not(:disabled):active {
+    border-bottom-width: 2px;
+    transform: translateY(2px);
+  }
+
+  &:disabled {
+    &::before {
+      display: none;
+    }
+  }
+}
+
+/* ---------- 图片/容器扫光效果 ---------- */
+
+.shine-img {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-img::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: linear-gradient(45deg,
+      rgba(255, 255, 255, 0) 45%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(255, 255, 255, 0) 55%);
+  transform: translateX(-100%);
+  animation: shine-img 2.5s infinite;
+}
+
+@keyframes shine-img {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }

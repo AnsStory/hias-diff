@@ -8,6 +8,10 @@ import HeaderActions from './components/HeaderActions.vue'
 import { getElColorPrimary, handleThemeStyle } from './utils/theme'
 
 const store = useDiffStore()
+const handleHeaderClick = () => {
+  store.screen = 'input'
+  store.reset()
+}
 
 onMounted(() => {
   const primaryColor = getElColorPrimary()
@@ -18,11 +22,7 @@ onMounted(() => {
 <template>
   <div class="app">
     <header class="app-header">
-      <span class="brand-logo">
-        <img src="/favicon.svg" alt="logo" width="24" height="24" />
-      </span>
-      <span class="brand-name">hias-diff</span>
-      <span class="spacer" />
+      <HeaderTitle @click="handleHeaderClick" />
       <HeaderActions />
     </header>
     <main class="app-main">
@@ -44,21 +44,11 @@ onMounted(() => {
 .app-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 10px 16px;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
-}
-.brand-logo {
-}
-.brand-name {
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.brand-slogan {
-  font-size: 12px;
-  color: var(--color-text-secondary);
 }
 
 .app-main {

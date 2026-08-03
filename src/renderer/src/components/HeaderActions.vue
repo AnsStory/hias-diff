@@ -24,7 +24,7 @@ onUnmounted(() => pwa.destroy())
       :title="isDark() ? '切换为亮色' : '切换为暗色'"
       @click="toggleTheme"
     />
-    <!-- <el-button v-if="!isElectron" :icon="Download" circle title="下载" @click="handleDownload" /> -->
+    <el-button v-if="!isElectron" :icon="Download" circle title="下载" @click="handleDownload" />
     <el-button
       v-if="!isElectron && pwa.canInstall"
       :icon="Monitor"

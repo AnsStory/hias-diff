@@ -1,1 +1,1 @@
-{"name":"hias-diff","short_name":"hias-diff","description":"hias-diff 对比工具","start_url":"/","display":"standalone","background_color":"#23272e","theme_color":"#7e57c2","lang":"en","scope":"/hias-diff/","icons":[{"src":"favicon.png","sizes":"192x192","type":"image/png"}]}
+{"name":"hias-diff","short_name":"hias-diff","description":"hias-diff 对比工具","start_url":"/hias-diff/","display":"standalone","background_color":"#23272e","theme_color":"#7e57c2","lang":"en","scope":"/hias-diff/","icons":[{"src":"favicon.png","sizes":"192x192","type":"image/png"}]}
