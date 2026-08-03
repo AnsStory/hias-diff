@@ -7,7 +7,7 @@ const animationClass = computed(() => getAnimationClass('bounceIn'))
 
 <template>
   <div class="HeaderTitle">
-    <span :class="animationClass + ' brand-name brand-name--double-line'">
+    <span :class="[animationClass, 'brand-name', 'brand-name--double-line']">
       <span class="brand-logo shine-img">
         <img src="/favicon.svg" alt="logo" />
       </span>

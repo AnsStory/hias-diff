@@ -5,7 +5,6 @@ import InputView from './views/InputView.vue'
 import ResultView from './views/ResultView.vue'
 import UpdateSWDialog from './components/UpdateSWDialog.vue'
 import HeaderActions from './components/HeaderActions.vue'
-import { getElColorPrimary, handleThemeStyle } from './utils/theme'
 import { animationMonitor } from './utils/animation'
 
 const store = useDiffStore()
@@ -16,8 +15,6 @@ const handleHeaderClick = () => {
 }
 
 onMounted(() => {
-  const primaryColor = getElColorPrimary()
-  handleThemeStyle(primaryColor)
   animationMonitor.startSampling()
 })
 

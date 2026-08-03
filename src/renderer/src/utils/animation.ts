@@ -2,10 +2,20 @@ export class AnimationPerformanceMonitor {
   private frameCount = 0
   private lastTime = performance.now()
   private fps = 60
+  private animationFrameId: number | null = null
   private samplingInterval: ReturnType<typeof setInterval> | null = null
 
   startSampling(intervalMs = 2000): void {
     if (this.samplingInterval) return
+    
+    // 启动requestAnimationFrame循环来计数帧
+    const animate = () => {
+      this.frameCount++
+      this.animationFrameId = requestAnimationFrame(animate)
+    }
+    this.animationFrameId = requestAnimationFrame(animate)
+    
+    // 启动定时器来计算FPS
     this.samplingInterval = setInterval(() => {
       const currentTime = performance.now()
       const deltaTime = currentTime - this.lastTime
@@ -18,6 +28,10 @@ export class AnimationPerformanceMonitor {
   }
 
   stopSampling(): void {
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId)
+      this.animationFrameId = null
+    }
     if (this.samplingInterval) {
       clearInterval(this.samplingInterval)
       this.samplingInterval = null

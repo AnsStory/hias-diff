@@ -241,30 +241,6 @@ body {
 
 /* ---------- 全局动画样式 ---------- */
 
-/* 页面切换动画 */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-/* 差异行悬停效果 */
-.diff-row {
-  transition: background-color 0.2s ease;
-}
-
-.diff-row:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-html.dark .diff-row:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
 /* 平滑滚动 */
 .smooth-scroll {
   scroll-behavior: smooth;
