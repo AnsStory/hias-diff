@@ -369,9 +369,8 @@ function applyIgnore(): void {
       >
         <template #reference>
           <el-button
-            type="primary"
-            :icon="Filter"
             :type="ignorePanelVisible ? 'primary' : 'default'"
+            :icon="Filter"
             class="m-l-12"
           >
             忽略规则
