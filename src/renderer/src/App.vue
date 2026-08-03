@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { Download, Moon, Sunny } from '@element-plus/icons-vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { Download, Monitor, Moon, Sunny } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import { useDiffStore } from './stores/diff'
 import { useTheme } from './composables/useTheme'
 import InputView from './views/InputView.vue'
 import ResultView from './views/ResultView.vue'
+import UpdateSWDialog from './components/UpdateSWDialog.vue'
 import { getElColorPrimary, handleThemeStyle } from './utils/theme'
 
 const store = useDiffStore()
@@ -17,10 +19,36 @@ const handleDownload = () => {
   window.open(url, '_blank')
 }
 
+let deferredPrompt: any = null
+
+const handleDesktopApplication = async () => {
+  console.log(deferredPrompt, `log_deferredPrompt`)
+  if (!deferredPrompt) {
+    ElMessage.info('当前浏览器不支持安装为桌面应用')
+    return
+  }
+  deferredPrompt.prompt()
+  const { outcome } = await deferredPrompt.userChoice
+  if (outcome === 'accepted') {
+    ElMessage.success('正在安装桌面应用…')
+  }
+  deferredPrompt = null
+}
+
+const onBeforeInstallPrompt = (e: Event) => {
+  e.preventDefault()
+  deferredPrompt = e
+}
+
 onMounted(() => {
   window.api?.onNewDiff(() => store.reset())
   const primaryColor = getElColorPrimary()
   handleThemeStyle(primaryColor)
+  window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt)
 })
 </script>
 
@@ -44,12 +72,21 @@ onMounted(() => {
           title="下载"
           @click="handleDownload"
         />
+        <el-button
+          v-if="!isElectron"
+          :icon="Monitor"
+          circle
+          title="桌面应用"
+          @click="handleDesktopApplication"
+        />
       </div>
     </header>
     <main class="app-main">
       <InputView v-if="store.screen === 'input'" />
       <ResultView v-else />
     </main>
+    <!-- 检测更新 -->
+    <UpdateSWDialog />
   </div>
 </template>
 

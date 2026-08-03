@@ -5,6 +5,7 @@ release
 *.log
 .DS_Store
 
+dev-dist
 # unplugin 自动生成的按需导入类型声明
 src/renderer/src/auto-imports.d.ts
 src/renderer/src/components.d.ts
