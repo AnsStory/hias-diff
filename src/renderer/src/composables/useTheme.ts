@@ -1,4 +1,5 @@
 import { ref, watch } from 'vue'
+import { getElColorPrimary, handleThemeStyle } from '../utils/theme'
 
 export type ThemeMode = 'light' | 'dark'
 
@@ -34,6 +35,8 @@ export function useTheme(): {
     isDark: () => theme.value === 'dark',
     toggleTheme: () => {
       theme.value = theme.value === 'dark' ? 'light' : 'dark'
+      const primaryColor = getElColorPrimary()
+      handleThemeStyle(primaryColor)
     }
   }
 }

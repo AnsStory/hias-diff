@@ -5,6 +5,7 @@ import { useDiffStore } from './stores/diff'
 import { useTheme } from './composables/useTheme'
 import InputView from './views/InputView.vue'
 import ResultView from './views/ResultView.vue'
+import { getElColorPrimary, handleThemeStyle } from './utils/theme'
 
 const store = useDiffStore()
 const { isDark, toggleTheme } = useTheme()
@@ -18,6 +19,8 @@ const handleDownload = () => {
 
 onMounted(() => {
   window.api?.onNewDiff(() => store.reset())
+  const primaryColor = getElColorPrimary()
+  handleThemeStyle(primaryColor)
 })
 </script>
 

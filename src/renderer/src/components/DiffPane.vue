@@ -15,7 +15,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  scroll: [top: number]
+  scroll: [top: number, left: number]
   changeDblclick: [sourceRow: number]
 }>()
 
@@ -25,6 +25,7 @@ const BUFFER = 10
 const scrollbarRef = ref<ScrollbarInstance | null>(null)
 const container = ref<HTMLElement | null>(null)
 const scrollTop = ref(0)
+const scrollLeft = ref(0)
 const viewportHeight = ref(600)
 let resizeObserver: ResizeObserver | null = null
 
@@ -109,12 +110,17 @@ function onScroll(): void {
   const el = container.value
   if (!el) return
   scrollTop.value = el.scrollTop
-  emit('scroll', el.scrollTop)
+  scrollLeft.value = el.scrollLeft
+  emit('scroll', el.scrollTop, el.scrollLeft)
 }
 
 function setScrollTop(top: number): void {
   const el = container.value
   if (el && Math.abs(el.scrollTop - top) > 1) el.scrollTop = top
+}
+function setScrollLeft(left: number): void {
+  const el = container.value
+  if (el && Math.abs(el.scrollLeft - left) > 1) el.scrollLeft = left
 }
 
 function scrollToIndex(index: number): void {
@@ -123,7 +129,7 @@ function scrollToIndex(index: number): void {
   el.scrollTo({ top: Math.max(0, index * ROW_HEIGHT - viewportHeight.value / 3) })
 }
 
-defineExpose({ setScrollTop, scrollToIndex })
+defineExpose({ setScrollTop, setScrollLeft, scrollToIndex })
 
 function segmentsFor(line: RenderLine): Segment[] {
   const tokenLines = line.side === 'left' ? props.tokens?.left : props.tokens?.right
@@ -153,6 +159,7 @@ onBeforeUnmount(() => {
   <el-scrollbar
     ref="scrollbarRef"
     class="diff-pane"
+    always
     @scroll="onScroll"
     @mouseleave="hoveredBlock = -1"
   >

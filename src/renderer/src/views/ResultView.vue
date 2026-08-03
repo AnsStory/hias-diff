@@ -37,6 +37,7 @@ const quoteSamples = ['\u2018', '\u2019', '\u201C', '\u201D', "'", '"']
 const dashSamples = ['-', '\u2010', '\u2013', '\u2014', '\u2015', '\u2212']
 const ROW_HEIGHT = 24
 const scrollTop = ref(0)
+const scrollLeft = ref(0)
 const resultBody = ref<HTMLElement | null>(null)
 
 const result = computed(() => store.result)
@@ -175,12 +176,14 @@ onUnmounted(() => {
 })
 
 let syncing = false
-function syncScroll(from: 'left' | 'right', top: number): void {
+function syncScroll(from: 'left' | 'right', top: number, left: number): void {
   scrollTop.value = top
+  scrollLeft.value = left
   if (syncing) return
   syncing = true
   const target = from === 'left' ? rightPane.value : leftPane.value
   target?.setScrollTop(top)
+  target?.setScrollLeft(left)
   requestAnimationFrame(() => {
     syncing = false
   })
@@ -472,14 +475,14 @@ function applyIgnore(): void {
           ref="leftPane"
           :lines="leftLines"
           :tokens="tokens"
-          @scroll="(top) => syncScroll('left', top)"
+          @scroll="(top, left) => syncScroll('left', top, left)"
           @change-dblclick="onBlockDblClick"
         />
         <DiffPane
           ref="rightPane"
           :lines="rightLines"
           :tokens="tokens"
-          @scroll="(top) => syncScroll('right', top)"
+          @scroll="(top, left) => syncScroll('right', top, left)"
           @change-dblclick="onBlockDblClick"
         />
       </div>
@@ -489,7 +492,7 @@ function applyIgnore(): void {
           :lines="unifiedLines"
           :tokens="tokens"
           unified
-          @scroll="(top) => (scrollTop = top)"
+          @scroll="(top, left) => ((scrollTop = top), (scrollLeft = left))"
           @change-dblclick="onBlockDblClick"
         />
       </div>

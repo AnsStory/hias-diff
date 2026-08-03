@@ -13,6 +13,7 @@
   --color-empty-bg: #f6f8fa;
   --color-empty-stripe: #eceef0;
   --font-mono: Consolas, 'Cascadia Mono', 'Courier New', monospace;
+  --el-color-primary: #7e57c2;
 }
 
 /* 暗色主题：基调 #23272e（底）/ #2c313c（面板），其余细节色调由二者推导 */
@@ -87,7 +88,7 @@ body {
   user-select: none;
 }
 
-.diff-row .gutter + .gutter {
+.diff-row .gutter+.gutter {
   left: 52px;
   border-left: none;
 }
@@ -120,16 +121,14 @@ body {
   /* 对角斜纹用 background-size 平铺（竖直周期 8px 能整除行高 24px），
      每行相位一致、跨行无缝连续，避免逐行重绘导致的斜纹断裂 */
   background-color: var(--color-empty-bg);
-  background-image: linear-gradient(
-    -45deg,
-    var(--color-empty-stripe) 25%,
-    transparent 25%,
-    transparent 50%,
-    var(--color-empty-stripe) 50%,
-    var(--color-empty-stripe) 75%,
-    transparent 75%,
-    transparent
-  );
+  background-image: linear-gradient(-45deg,
+      var(--color-empty-stripe) 25%,
+      transparent 25%,
+      transparent 50%,
+      var(--color-empty-stripe) 50%,
+      var(--color-empty-stripe) 75%,
+      transparent 75%,
+      transparent);
   background-size: 8px 8px;
 }
 
