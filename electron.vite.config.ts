@@ -5,6 +5,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   main: {
@@ -33,6 +34,30 @@ export default defineConfig({
       Components({
         resolvers: [ElementPlusResolver()],
         dts: 'src/components.d.ts'
+      }),
+      VitePWA({
+        injectRegister: 'script',
+        devOptions: {
+          enabled: true
+        },
+        manifest: {
+          name: 'hias-diff',
+          short_name: 'hias-diff',
+          description: 'hias-diff 对比工具',
+          display: 'standalone',
+          background_color: '#23272e',
+          theme_color: '#7e57c2',
+          icons: [
+            {
+              src: 'favicon.png',
+              sizes: '192x192',
+              type: 'image/png'
+            }
+          ]
+        },
+        workbox: {
+          globPatterns: ['**/*.{html,js,css,png,svg,ico,woff2}']
+        }
       })
     ]
   }
