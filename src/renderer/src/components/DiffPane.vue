@@ -126,7 +126,10 @@ function setScrollLeft(left: number): void {
 function scrollToIndex(index: number): void {
   const el = container.value
   if (!el) return
-  el.scrollTo({ top: Math.max(0, index * ROW_HEIGHT - viewportHeight.value / 3) })
+  el.scrollTo({
+    top: Math.max(0, index * ROW_HEIGHT - viewportHeight.value / 3),
+    behavior: 'smooth'
+  })
 }
 
 defineExpose({ setScrollTop, setScrollLeft, scrollToIndex })
@@ -215,6 +218,18 @@ onBeforeUnmount(() => {
 
 .diff-pane :deep(.el-scrollbar__view) {
   height: 100%;
+}
+
+.diff-row {
+  transition: background-color 0.2s ease;
+}
+
+.diff-row:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+html.dark .diff-row:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .diff-spacer {
