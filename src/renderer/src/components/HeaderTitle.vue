@@ -3,7 +3,9 @@
 <template>
   <div class="HeaderTitle">
     <span class="brand-name animate__bounceIn brand-name--double-line">
-      <img src="/favicon.svg" alt="logo" class="brand-logo shine-img" />
+      <span class="brand-logo shine-img">
+        <img src="/favicon.svg" alt="logo" />
+      </span>
       hias<span>.</span>diff
     </span>
   </div>
