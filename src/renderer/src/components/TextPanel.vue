@@ -41,7 +41,9 @@ function onScroll(): void {
 }
 
 onMounted(() => {
-  const el = document.querySelector(`.text-panel[data-side="${props.side}"] textarea`) as HTMLTextAreaElement | null
+  const el = document.querySelector(
+    `.text-panel[data-side="${props.side}"] textarea`
+  ) as HTMLTextAreaElement | null
   if (el) {
     textareaRef.value = el
     el.addEventListener('scroll', onScroll)
@@ -112,6 +114,7 @@ onUnmounted(() => {
   height: 100%;
   background: var(--color-surface);
   color: var(--color-text);
+  resize: none;
 }
 :deep(.panel-input textarea::-webkit-scrollbar) {
   width: 8px;

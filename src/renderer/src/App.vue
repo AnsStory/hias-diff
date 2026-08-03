@@ -1,85 +1,29 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { Download, Monitor, Moon, Sunny } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
+import { onMounted } from 'vue'
 import { useDiffStore } from './stores/diff'
-import { useTheme } from './composables/useTheme'
 import InputView from './views/InputView.vue'
 import ResultView from './views/ResultView.vue'
 import UpdateSWDialog from './components/UpdateSWDialog.vue'
+import HeaderActions from './components/HeaderActions.vue'
 import { getElColorPrimary, handleThemeStyle } from './utils/theme'
 
 const store = useDiffStore()
-const { isDark, toggleTheme } = useTheme()
-
-const isElectron = navigator.userAgent.includes('Electron')
-
-const url = 'https://github.com/AnsStory/hias-diff/releases'
-const handleDownload = () => {
-  window.open(url, '_blank')
-}
-
-let deferredPrompt: any = null
-
-const handleDesktopApplication = async () => {
-  console.log(deferredPrompt, `log_deferredPrompt`)
-  if (!deferredPrompt) {
-    ElMessage.info('当前浏览器不支持安装为桌面应用')
-    return
-  }
-  deferredPrompt.prompt()
-  const { outcome } = await deferredPrompt.userChoice
-  if (outcome === 'accepted') {
-    ElMessage.success('正在安装桌面应用…')
-  }
-  deferredPrompt = null
-}
-
-const onBeforeInstallPrompt = (e: Event) => {
-  e.preventDefault()
-  deferredPrompt = e
-}
 
 onMounted(() => {
-  window.api?.onNewDiff(() => store.reset())
   const primaryColor = getElColorPrimary()
   handleThemeStyle(primaryColor)
-  window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt)
 })
 </script>
 
 <template>
   <div class="app">
     <header class="app-header">
+      <span class="brand-logo">
+        <img src="/favicon.svg" alt="logo" width="24" height="24" />
+      </span>
       <span class="brand-name">hias-diff</span>
       <span class="spacer" />
-      <div>
-        <el-button
-          class="theme-toggle"
-          circle
-          :icon="isDark() ? Sunny : Moon"
-          :title="isDark() ? '切换为亮色' : '切换为暗色'"
-          @click="toggleTheme"
-        />
-        <el-button
-          v-if="!isElectron"
-          :icon="Download"
-          circle
-          title="下载"
-          @click="handleDownload"
-        />
-        <el-button
-          v-if="!isElectron"
-          :icon="Monitor"
-          circle
-          title="桌面应用"
-          @click="handleDesktopApplication"
-        />
-      </div>
+      <HeaderActions />
     </header>
     <main class="app-main">
       <InputView v-if="store.screen === 'input'" />
@@ -105,7 +49,8 @@ onBeforeUnmount(() => {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
 }
-
+.brand-logo {
+}
 .brand-name {
   font-size: 17px;
   font-weight: 700;

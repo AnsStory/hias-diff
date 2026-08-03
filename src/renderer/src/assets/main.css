@@ -31,6 +31,7 @@ html.dark {
   --color-added-strong: #2f5d3d;
   --color-empty-bg: #23272e;
   --color-empty-stripe: #333944;
+
 }
 
 /* normalize.css 已处理跨浏览器重置与 body 外边距；此处仅补充 box-sizing */
