@@ -30,13 +30,17 @@ export function useTheme(): {
   isDark: () => boolean
   toggleTheme: () => void
 } {
+  const overloadThemeStyles = () => {
+    const primaryColor = getElColorPrimary()
+    handleThemeStyle(primaryColor)
+  }
+  overloadThemeStyles()
   return {
     theme,
     isDark: () => theme.value === 'dark',
     toggleTheme: () => {
       theme.value = theme.value === 'dark' ? 'light' : 'dark'
-      const primaryColor = getElColorPrimary()
-      handleThemeStyle(primaryColor)
+      overloadThemeStyles()
     }
   }
 }
