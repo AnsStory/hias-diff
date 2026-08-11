@@ -21,10 +21,12 @@ import { segmentLine, type Segment, type TokenSpan } from '../core/highlight/seg
 import { LANGUAGE_OPTIONS } from '../core/highlight/languages'
 import { theme } from '../composables/useTheme'
 import { getAnimationClass } from '../utils/animation'
+import type { ScrollbarInstance } from 'element-plus'
 
 const promptAnimationClass = computed(() => getAnimationClass('lightSpeedInRight'))
 const store = useDiffStore()
-
+const popupLeftRef = ref<ScrollbarInstance | null>(null)
+const popupRightRef = ref<ScrollbarInstance | null>(null)
 const toolbarRef = ref<HTMLElement | null>(null)
 const toolbarHeight = ref(0)
 
@@ -222,6 +224,17 @@ function syncScroll(from: 'left' | 'right', top: number, left: number): void {
   })
 }
 
+function popupScroll(from: 'left' | 'right', top: number, left: number): void {
+  if (syncing) return
+  syncing = true
+  const target = from === 'left' ? popupRightRef.value : popupLeftRef.value
+  target?.setScrollTop(top)
+  target?.setScrollLeft(left)
+  requestAnimationFrame(() => {
+    syncing = false
+  })
+}
+
 function scrollToBlock(rowIndex: number): void {
   if (store.viewMode === 'split') {
     leftPane.value?.scrollToIndex(rowIndex)
@@ -312,7 +325,7 @@ function applyIgnore(): void {
 <template>
   <div class="result-view">
     <div class="result-toolbar" ref="toolbarRef">
-      <el-button type="primary" :icon="Back" @click="store.backToInput()">重新编辑</el-button>
+      <el-button type="primary" :icon="Back" @click="store.backToInput()" title="重新编辑" />
       <el-button :icon="Switch" @click="store.swapSides()">互换</el-button>
       <el-button
         :icon="RefreshLeft"
@@ -361,6 +374,14 @@ function applyIgnore(): void {
         <el-radio-button value="split">并排</el-radio-button>
         <el-radio-button value="unified">统一</el-radio-button>
       </el-radio-group>
+      <el-button
+        class="m-l-12"
+        :icon="Top"
+        :disabled="!blocks.length"
+        @click="goTo(-1)"
+        title="上一处"
+      />
+      <el-button :icon="Bottom" :disabled="!blocks.length" @click="goTo(1)" title="下一处" />
       <el-popover
         placement="bottom-end"
         :width="320"
@@ -368,16 +389,10 @@ function applyIgnore(): void {
         v-model:visible="ignorePanelVisible"
       >
         <template #reference>
-          <el-button
-            :type="ignorePanelVisible ? 'primary' : 'default'"
-            :icon="Filter"
-            class="m-l-12"
-          >
-            忽略规则
-          </el-button>
+          <el-button type="primary" :icon="Filter" class="m-l-12"> </el-button>
         </template>
         <div class="ignore-panel-content">
-          <div class="ignore-panel-title">忽略以下差异…</div>
+          <div class="ignore-panel-title">忽略规则:忽略以下差异…</div>
           <el-checkbox v-model="store.ignoreQuotes">引号</el-checkbox>
           <div class="ignore-samples">
             <el-tag
@@ -427,8 +442,6 @@ function applyIgnore(): void {
           </div>
         </div>
       </el-popover>
-      <el-button :icon="Top" :disabled="!blocks.length" @click="goTo(-1)">上一处</el-button>
-      <el-button :icon="Bottom" :disabled="!blocks.length" @click="goTo(1)">下一处</el-button>
     </div>
 
     <div class="result-body" ref="resultBody">
@@ -451,7 +464,13 @@ function applyIgnore(): void {
         </div>
         <div class="change-popup-body">
           <div v-if="store.viewMode === 'split'" class="popup-diff split">
-            <div class="popup-col">
+            <!-- 单行24超过10行展示滚动条 -->
+            <el-scrollbar
+              ref="popupLeftRef"
+              class="popup-col"
+              max-height="240"
+              @scroll="({ scrollTop, scrollLeft }) => popupScroll('left', scrollTop, scrollLeft)"
+            >
               <div
                 v-for="row in popupSplitRows"
                 :key="'l' + row.key"
@@ -469,8 +488,14 @@ function applyIgnore(): void {
                   </template>
                 </span>
               </div>
-            </div>
-            <div class="popup-col">
+            </el-scrollbar>
+            <!-- 单行24超过10行展示滚动条 -->
+            <el-scrollbar
+              ref="popupRightRef"
+              class="popup-col"
+              max-height="240"
+              @scroll="({ scrollTop, scrollLeft }) => popupScroll('right', scrollTop, scrollLeft)"
+            >
               <div
                 v-for="row in popupSplitRows"
                 :key="'r' + row.key"
@@ -488,7 +513,7 @@ function applyIgnore(): void {
                   </template>
                 </span>
               </div>
-            </div>
+            </el-scrollbar>
           </div>
           <div v-else class="popup-diff unified">
             <div
@@ -568,6 +593,44 @@ function applyIgnore(): void {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   flex-wrap: wrap;
+  gap: 6px;
+
+  z-index: 6;
+}
+
+@media (max-width: 1200px) {
+  .prompt {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .result-toolbar .el-button span:not(.el-icon) {
+    display: none;
+  }
+  .result-toolbar .el-radio-button__inner {
+    padding: 8px 10px;
+  }
+  .result-toolbar .m-l-12 {
+    margin-left: 6px;
+  }
+  .lang-select {
+    width: 100px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .result-toolbar {
+    gap: 4px;
+    padding: 6px;
+  }
+  .result-toolbar .el-tag {
+    display: none;
+  }
+}
+
+.lang-select {
+  width: 160px;
 }
 .spacer {
   flex: 1;
@@ -693,11 +756,15 @@ function applyIgnore(): void {
   grid-template-columns: 1fr 1fr;
   gap: 1px;
   background: var(--color-border);
+  overflow: hidden;
 }
 
 .popup-col {
   background: var(--color-surface);
-  overflow: hidden;
+}
+
+.popup-col :deep(.el-scrollbar__bar.is-horizontal) {
+  height: 0;
 }
 
 .change-popup-actions {

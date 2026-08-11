@@ -90,8 +90,10 @@ const copyBtnTop = computed(() => {
   if (!b) return 0
   const min = b.startPos * ROW_HEIGHT
   const max = Math.max(min, b.endPos * ROW_HEIGHT - ROW_HEIGHT)
-  return Math.min(Math.max(scrollTop.value + 4, min), max)
+  return Math.min(Math.max(scrollTop.value + 4, min), max) + 'px'
 })
+/** 复制按钮横向位置：钉在块内、随滚动保持可见 */
+const copyBtnRight = computed(() => `${-scrollLeft.value + 12}px`)
 
 async function copyBlock(block: CopyBlock): Promise<void> {
   try {
@@ -171,7 +173,6 @@ onBeforeUnmount(() => {
         v-if="hoveredBlockData"
         class="copy-block-btn"
         size="small"
-        :style="{ top: copyBtnTop + 'px' }"
         @click="copyBlock(hoveredBlockData)"
       >
         {{ copiedBlock === hoveredBlockData.id ? '已复制' : '复制' }}
@@ -241,7 +242,9 @@ html.dark .diff-row:hover {
 /* 复制按钮：绝对定位交给此 class，外观由 el-button 负责 */
 .copy-block-btn {
   position: absolute;
-  right: 12px;
+  top: v-bind(copyBtnTop);
+  right: v-bind(copyBtnRight);
+  transition: none;
   z-index: 3;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
 }

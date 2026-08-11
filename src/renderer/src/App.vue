@@ -55,6 +55,7 @@ onUnmounted(() => {
   padding: 10px 16px;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
+  z-index: 6;
 }
 
 .app-main {
