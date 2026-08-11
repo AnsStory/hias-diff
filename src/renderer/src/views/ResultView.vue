@@ -126,7 +126,7 @@ const popupRenderRow = computed(() => {
 // 浮层纵向位置
 const popupTop = computed(() => {
   const top = popupRenderRow.value * ROW_HEIGHT - scrollTop.value - toolbarHeight.value
-  return top
+  return top > 6 ? top : 6
 })
 
 // 浮层内展示的当前变更块（并排：左右两列成对；统一：单列）
